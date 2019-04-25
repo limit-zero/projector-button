@@ -5,6 +5,7 @@ This project requires [Yarn](https://yarnpkg.com/en/docs/install) and [NodeJS 10
 ## Installation
 - Clone this repository (`git clone https://github.com/limit-zero/projector-button.git`)
 - From the project root, install dependencies via `yarn install`
+- Setup the required environment variables (see below)
 - When developing, run `yarn dev`
 - When serving in production, run `yarn serve`
 - The service is now available on `http://localhost:4999` or whatever port you configure
