@@ -11,7 +11,6 @@ const {
   magenta,
   cyan,
   red,
-  yellow,
 } = require('chalk');
 const { spawn } = require('child_process');
 
