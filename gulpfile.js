@@ -21,11 +21,6 @@ const server = async () => {
   if (node) node.kill();
   isFirstRun = false;
   node = await spawn('node', ['src/index.js'], { stdio: ['inherit', 'inherit', 'inherit', 'ipc'] });
-  node.on('message', (msg) => {
-    if (msg.event === 'ready') {
-      log(`Server ${green('ready')} on ${yellow(msg.location)}`);
-    }
-  });
   node.on('close', (code, signal) => {
     const exited = [];
     if (code) exited.push(`code ${magenta(code)}`);
