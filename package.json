@@ -18,6 +18,8 @@
     "gulp-eslint": "^5.0.0"
   },
   "dependencies": {
+    "@base-cms/utils": "^0.8.0",
+    "cheerio": "^1.0.0-rc.3",
     "envalid": "^5.0.0",
     "express": "^4.16.4",
     "node-fetch": "^2.3.0"
