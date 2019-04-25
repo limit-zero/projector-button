@@ -2,15 +2,15 @@ const cheerio = require('cheerio');
 const express = require('express');
 const fetch = require('node-fetch');
 const { asyncRoute } = require('@base-cms/utils');
-const { USERNAME, PASSWORD, PROJECTOR_URI } = require('./env');
+const { USERNAME, PASSWORD } = require('./env');
 
 const app = express();
 
 const createAuth = () => Buffer.from(`${USERNAME}:${PASSWORD}`).toString('base64');
 
-const checkStatus = async () => {
+const checkStatus = async (hostname) => {
   const query = 'key=pow_on&lang=e&from=BASIC_CTL';
-  const response = await fetch(`${PROJECTOR_URI}/cgi-bin/power_ctl.cgi?${query}`, {
+  const response = await fetch(`http://${hostname}/cgi-bin/power_ctl.cgi?${query}`, {
     method: 'get',
     headers: {
       Authorization: `Basic ${createAuth()}`,
@@ -22,8 +22,8 @@ const checkStatus = async () => {
   return $('body').text().trim();
 };
 
-const powerOn = async () => {
-  const response = await fetch(`${PROJECTOR_URI}/cgi-bin/power_on.cgi`, {
+const powerOn = async (hostname) => {
+  const response = await fetch(`http://${hostname}/cgi-bin/power_on.cgi`, {
     method: 'post',
     headers: {
       Authorization: `Basic ${createAuth()}`,
@@ -36,13 +36,15 @@ const powerOn = async () => {
   return $('body').text().trim();
 };
 
-app.get('/', asyncRoute(async (req, res) => {
-  const status = await checkStatus();
+app.get('/:hostname(*)', asyncRoute(async (req, res) => {
+  const { params } = req;
+  const { hostname } = params;
+  const status = await checkStatus(hostname);
   if (status !== 'Are you sure to let projector power on ?') {
-    res.send('The projector is already on.');
+    res.send(`The projector "${hostname}" is already on.`);
   } else {
-    const result = await powerOn();
-    res.send(result);
+    await powerOn(hostname);
+    res.send(`The projector "${hostname}" is powering on!`);
   }
 }));
 

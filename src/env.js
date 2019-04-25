@@ -13,5 +13,4 @@ const nonemptystr = makeValidator((v) => {
 module.exports = cleanEnv(process.env, {
   USERNAME: nonemptystr({ desc: 'The projector username.' }),
   PASSWORD: nonemptystr({ desc: 'The projector password.' }),
-  PROJECTOR_URI: nonemptystr({ desc: 'The projector URI.' }),
 });
