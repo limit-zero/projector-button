@@ -21,4 +21,4 @@ You can also change the default port using the `PORT` environment variable.
 
 ## Usage
 Once the service is running, you can power on a projector by visiting `http://localhost:/[projector-host-name]`.
-For example: `http://localhost:/your-projector.your-domain.com`
+For example: `http://localhost:4999/your-projector.your-domain.com`
