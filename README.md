@@ -3,7 +3,7 @@
 This project requires [Yarn](https://yarnpkg.com/en/docs/install) and [NodeJS 10](https://nodejs.org/en/download/).
 
 ## Installation
-- Clone this repository
+- Clone this repository (`git clone https://github.com/limit-zero/projector-button.git`)
 - From the project root, install dependencies via `yarn install`
 - When developing, run `yarn dev`
 - When serving in production, run `yarn serve`
