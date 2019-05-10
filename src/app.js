@@ -44,22 +44,26 @@ app.get('/:hostname(*)', asyncRoute(async (req, res) => {
   const { hostname } = params;
 
   let status = '';
-  const onResponse = await powerOn(hostname);
-  switch (onResponse) {
-    case 'Starting projector.After lamp turn on, open top page again.':
-      status = 'Starting projector...';
-      break;
-    case 'Cooling Down. Please wait until projector returns to standby.':
-      status = 'Cooling down...';
-      break;
-    case 'Projector has already turned on.':
-      await powerOff(hostname);
-      status = 'Entering standby...';
-      break;
-    default:
-      break;
+  try {
+    const onResponse = await powerOn(hostname);
+    switch (onResponse) {
+      case 'Starting projector.After lamp turn on, open top page again.':
+        status = 'Starting projector...';
+        break;
+      case 'Cooling Down. Please wait until projector returns to standby.':
+        status = 'Cooling down...';
+        break;
+      case 'Projector has already turned on.':
+        await powerOff(hostname);
+        status = 'Entering standby...';
+        break;
+      default:
+        break;
+    }
+    res.json({ hostname, status });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
   }
-  res.json({ hostname, status });
 }));
 
 module.exports = app;
