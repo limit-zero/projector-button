@@ -5,16 +5,15 @@ const { asyncRoute } = require('@base-cms/utils');
 const { USERNAME, PASSWORD } = require('./env');
 
 const app = express();
+const auth = Buffer.from(`${USERNAME}:${PASSWORD}`).toString('base64');
 
-const createAuth = () => Buffer.from(`${USERNAME}:${PASSWORD}`).toString('base64');
-
-const checkStatus = async (hostname) => {
-  const query = 'key=pow_on&lang=e&from=BASIC_CTL';
-  const response = await fetch(`http://${hostname}/cgi-bin/power_ctl.cgi?${query}`, {
-    method: 'get',
+const powerOn = async (hostname) => {
+  const response = await fetch(`http://${hostname}/cgi-bin/power_on.cgi`, {
+    method: 'post',
     headers: {
-      Authorization: `Basic ${createAuth()}`,
+      Authorization: `Basic ${auth}`,
     },
+    body: 'lang=e&from=BASIC_CTL',
   });
   if (!response.ok) throw new Error(response.statusText);
   const body = await response.text();
@@ -22,11 +21,11 @@ const checkStatus = async (hostname) => {
   return $('body').text().trim();
 };
 
-const powerOn = async (hostname) => {
-  const response = await fetch(`http://${hostname}/cgi-bin/power_on.cgi`, {
+const powerOff = async (hostname) => {
+  const response = await fetch(`http://${hostname}/cgi-bin/power_off.cgi`, {
     method: 'post',
     headers: {
-      Authorization: `Basic ${createAuth()}`,
+      Authorization: `Basic ${auth}`,
     },
     body: 'lang=e&from=BASIC_CTL',
   });
@@ -39,13 +38,24 @@ const powerOn = async (hostname) => {
 app.get('/:hostname(*)', asyncRoute(async (req, res) => {
   const { params } = req;
   const { hostname } = params;
-  const status = await checkStatus(hostname);
-  if (status !== 'Are you sure to let projector power on ?') {
-    res.send(`The projector "${hostname}" is already on.`);
-  } else {
-    await powerOn(hostname);
-    res.send(`The projector "${hostname}" is powering on!`);
+
+  let status = '';
+  const onResponse = await powerOn(hostname);
+  switch (onResponse) {
+    case 'Starting projector.After lamp turn on, open top page again.':
+      status = 'Starting projector...';
+      break;
+    case 'Cooling Down. Please wait until projector returns to standby.':
+      status = 'Cooling down...';
+      break;
+    case 'Projector has already turned on.':
+      await powerOff(hostname);
+      status = 'Entering standby...';
+      break;
+    default:
+      break;
   }
+  res.json({ hostname, status });
 }));
 
 module.exports = app;
