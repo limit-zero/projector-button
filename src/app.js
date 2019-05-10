@@ -35,6 +35,10 @@ const powerOff = async (hostname) => {
   return $('body').text().trim();
 };
 
+app.get('/', (req, res) => res.json({ ping: 'pong' }));
+
+app.get('/favicon.ico', (req, res) => res.status(404).send());
+
 app.get('/:hostname(*)', asyncRoute(async (req, res) => {
   const { params } = req;
   const { hostname } = params;
